@@ -1,0 +1,96 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+class Wallet {
+    private double balance;
+
+    public Wallet(double initialBalance) {
+        this.balance = initialBalance;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void addMoney(double amount) {
+        balance += amount;
+    }
+
+    public boolean deductMoney(double amount) {
+        if (amount <= balance) {
+            balance -= amount;
+            return true;
+        } else {
+            System.out.println("Insufficient balance!");
+            return false;
+        }
+    }
+}
+
+class User {
+    private String userId;
+    private Wallet wallet;
+
+    public User(String userId, double initialBalance) {
+        this.userId = userId;
+        this.wallet = new Wallet(initialBalance);
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public Wallet getWallet() {
+        return wallet;
+    }
+}
+
+class PaymentGateway {
+    public static boolean makePayment(User payer, User payee, double amount) {
+        if (payer.getWallet().deductMoney(amount)) {
+            payee.getWallet().addMoney(amount);
+            System.out.println("Payment successful!");
+            return true;
+        } else {
+            System.out.println("Payment failed!");
+            return false;
+        }
+    }
+}
+
+public class PaytmApplication {
+    private static Map<String, User> users = new HashMap<>();
+
+    public static void main(String[] args) {
+        initializeUsers();
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter payer's user ID: ");
+        String payerId = scanner.nextLine();
+
+        System.out.print("Enter payee's user ID: ");
+        String payeeId = scanner.nextLine();
+
+        System.out.print("Enter the amount to transfer: ");
+        double amount = scanner.nextDouble();
+
+        User payer = users.get(payerId);
+        User payee = users.get(payeeId);
+
+        if (payer != null && payee != null) {
+            PaymentGateway.makePayment(payer, payee, amount);
+        } else {
+            System.out.println("Invalid user ID!");
+        }
+
+        scanner.close();
+    }
+
+    private static void initializeUsers() {
+        users.put("user1", new User("user1", 1000.0));
+        users.put("user2", new User("user2", 500.0));
+        users.put("user3", new User("user3", 800.0));
+    }
+}
